@@ -6,61 +6,38 @@ namespace EventHandlerWithParameter
     {
         static void Main(string[] args)
         {
-            Counter c = new Counter(5);
-            c.ThresholdReached += c_ThresholdReached;
-
-            Console.WriteLine("press 'a' key to increase total");
-            while (Console.ReadKey(true).KeyChar == 'a')
+            Console.WriteLine("Please press A ");
+            var key = Console.ReadLine();
+            if (key == "a")
             {
-                Console.WriteLine("adding one");
-                c.Add(1);
+                KeyPressed();
             }
         }
 
-        static void c_ThresholdReached(object sender, ThresholdReachedEventArgs e)
+        static void KeyPressed()
         {
-            Console.WriteLine("The threshold of {0} was reached at {1}.", e.Threshold, e.TimeReached);
-            Environment.Exit(0);
+            Button button = new Button();
+            button.ClickEvent += (s, args) =>
+            {
+                Console.WriteLine($"you clicked a button {args.Name}");
+            };
+            button.OnClick();
         }
     }
 
-    class Counter
+    public class Button
     {
-        private int threshold;
-        private int total;
-
-        public Counter(int passedThreshold)
+        public EventHandler<MyArgs> ClickEvent;
+        public void OnClick()
         {
-            threshold = passedThreshold;
+            MyArgs myArgs = new MyArgs();
+            myArgs.Name = "Cheng";
+            ClickEvent.Invoke(this, myArgs);
         }
-
-        public void Add(int x)
-        {
-            total += x;
-            if (total >= threshold)
-            {
-                ThresholdReachedEventArgs args = new ThresholdReachedEventArgs();
-                args.Threshold = threshold;
-                args.TimeReached = DateTime.Now;
-                OnThresholdReached(args);
-            }
-        }
-
-        protected virtual void OnThresholdReached(ThresholdReachedEventArgs e)
-        {
-            EventHandler<ThresholdReachedEventArgs> handler = ThresholdReached;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-        public event EventHandler<ThresholdReachedEventArgs> ThresholdReached;
     }
-
-    public class ThresholdReachedEventArgs : EventArgs
+    public class MyArgs : EventArgs
     {
-        public int Threshold { get; set; }
-        public DateTime TimeReached { get; set; }
+        public string Name { get; set; }
     }
+    
 }
